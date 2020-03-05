@@ -1,7 +1,24 @@
 use crate::kv_error::KvError;
 
+use wasm_bindgen::prelude::*;
 use wasm_bindgen::{JsCast, JsValue};
-use wasm_bindgen_futures::JsFuture;
+use wasm_bindgen_futures::{JsFuture};
+use js_sys::{ Promise};
+
+#[wasm_bindgen]
+extern "C" {
+    type WORKER_KV;
+
+    #[wasm_bindgen(static_method_of = WORKER_KV)]
+    fn get(key: &str) -> Promise;
+
+    #[wasm_bindgen(static_method_of = WORKER_KV)]
+    fn put(key: &str, val: &str) -> Promise;
+
+    #[wasm_bindgen(static_method_of = WORKER_KV)]
+    fn delete(key: &str) -> Promise;
+}
+
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct KvResponse {

@@ -7,10 +7,11 @@ addEventListener('fetch', event => {
  * @param {Request} request
  */
 async function handleRequest(request) {
-    const { respond_wrapper } = wasm_bindgen;
+    const { respond2_wrapper } = wasm_bindgen;
     await wasm_bindgen(wasm);
     const t = new Date().getTime();
     console.time('WorkerTimer');
+    console.log(WORKER_KV);
 
     let body;
     if (request.body) {
@@ -24,7 +25,7 @@ async function handleRequest(request) {
         headers[key] = request.headers.get(key);
     }
 
-    const response = await respond_wrapper({
+    const response = await respond2_wrapper({
         method: request.method,
         headers: headers,
         url: request.url,
@@ -34,8 +35,9 @@ async function handleRequest(request) {
         kv_auth_email: KV_AUTH_EMAIL,
         kv_auth_key: KV_AUTH_KEY
     });
-    response.body += ` time ${new Date().getTime() - t}`;
-    console.log(response.body);
+    console.log(response);
+    // response.body += ` time ${new Date().getTime() - t}`;
+    // console.log(response.body);
     console.timeEnd('WorkerTimer');
 
     return new Response(response.body, {

@@ -16,7 +16,23 @@ use web_sys;
 
 use kv_error::KvError;
 use workers_kv::{KvResponse, WorkersKv};
+// use wasm_bindgen::prelude::*;
+// use wasm_bindgen::{JsCast};
+use wasm_bindgen_futures::{JsFuture,future_to_promise};
+use js_sys::{ Promise};
+#[wasm_bindgen]
+extern "C" {
+    type WORKER_KV;
 
+    #[wasm_bindgen(static_method_of = WORKER_KV)]
+    fn get(key: &str) -> Promise;
+
+    #[wasm_bindgen(static_method_of = WORKER_KV)]
+    fn put(key: &str, val: &str) -> Promise;
+
+    #[wasm_bindgen(static_method_of = WORKER_KV)]
+    fn delete(key: &str) -> Promise;
+}
 cfg_if! {
     // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
     // allocator.
@@ -121,4 +137,11 @@ async fn respond(req: Request) -> Result<Response, Box<dyn std::error::Error>> {
         "PUT" => handle_response(worker.add(key, value.unwrap()).await),
         method => html_response(404, format!("Invalid method: {}", method)),
     })
+}
+
+
+
+#[wasm_bindgen]
+pub fn respond2_wrapper(_req: JsValue)  -> Promise  {
+    future_to_promise(JsFuture::from(WORKER_KV::put("asdfasdf", "asdfasdf")))
 }
